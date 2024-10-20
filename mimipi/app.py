@@ -7,21 +7,16 @@ from fastapi import FastAPI, Header, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from .product import Product
+
 
 app = FastAPI()
-
-class Product(BaseModel):
-    upc: str
-    name: str
-    details: str
-    weight: int
-    barcode: str
 
 
 def stream_csv(products):
     yield "upc,name,details,weight,barcode\n"
     for product in products:
-        yield f"{product.upc},{product.name},{product.details},{product.weight},{product.barcode}\n"
+        yield f"{product.upc if product.upc else ''},{product.name},{product.details},{product.weight},{product.barcode}\n"
 
 
 @app.get("/product")
@@ -36,19 +31,13 @@ def get_product(
     fake = Faker()
     fake.seed_instance(seed)
 
-    products = []
-
-    for _ in range(quantity):
-        products.append(
-            Product(
-                upc=fake.ean8(),
-                name=fake.name(),
-                details=fake.text(),
-                weight=fake.random_int(),
-                barcode=fake.ean()
-            )
-        )
-
+    products = [Product(
+        upc=fake.ean8(),
+        name=fake.word(),
+        details=fake.sentence(),
+        weight=fake.random_int(1, 100),
+        barcode=fake.ean13(),
+    ) for _ in range(quantity)]
 
     match accept:
         case "text/csv":
