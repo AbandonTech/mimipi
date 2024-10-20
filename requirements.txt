@@ -1,0 +1,4 @@
+faker~=30.6.0
+fastapi~=0.115.2
+pandas~=2.2.3
+uvicorn~=0.32.0
