@@ -1,0 +1,35 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      latest:
+        description: "If the image should be tagged as latest."
+        type: boolean
+        required: false
+        default: false
+      push:
+        description: "If the built image should be pushed."
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  build:
+    name: build docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: ${{ inputs.push }}
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          push: ${{ inputs.push }}
+          tags: |
+            ghcr.io/abandontech/mimipi:${{ steps.sha_tag.outputs.tag }}
+            ${{ inputs.latest && 'ghcr.io/abandontech/mimipi:latest' || '' }}
