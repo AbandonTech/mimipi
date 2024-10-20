@@ -27,6 +27,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: create container tag
+        id: sha_tag
+        run: |
+          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
+          echo "tag=$tag" >> $GITHUB_OUTPUT
       - uses: docker/build-push-action@v6
         with:
           push: ${{ inputs.push }}
