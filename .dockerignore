@@ -1,0 +1,7 @@
+** # Ignore everything!
+
+# Make exceptions.
+!mimipi
+!requirements.txt
+
+# Thank the busdriver (chrisjl)
